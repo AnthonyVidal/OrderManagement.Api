@@ -1,13 +1,58 @@
 ﻿
 ---
 
-## 📦 Proyectos de la Solución  
-*(en el orden en que fueron construidos)*
-
+## 📦 Modernización de un Módulo Crítico de Ventas - Sistema Legacy .NET Framework  
 ---
+## 1️ Contexto General 
+La empresa cuenta con una aplicación legado construida sobre:
+- ASP.NET MVC 5 (con .NET Framework 4.7)
+- Servicios WCF para intercambio de datos entre módulos
+- ADO.NET y procedimientos almacenados en SQL Server
+- Windows Services para tareas en segundo plano
+La arquitectura presenta problemas de escalabilidad, mantenibilidad y extensibilidad. Se busca evaluar si el candidato está en capacidad de liderar un proceso de modernización desde el entendimiento del sistema actual, aplicando principios modernos y diseñando una solución sostenible.
+
+## 1️ Análisis del Sistema Actual
+
+## 2.1 Principales Problemas Identificados ⚠️
+
+### Alto acoplamiento
+- Controllers MVC contienen lógica de negocio.
+- Dependencia directa a ADO.NET y SPs.
+- Cambios pequeños generan impactos transversales.  
+
+### Baja mantenibilidad y testabilidad
+- Difícil aplicar pruebas unitarias.
+- Lógica distribuida entre código y base de datos.
+- WCF y Windows Services dificultan mocking y automatización.
+
+### Limitaciones de escalabilidad
+- Arquitectura monolítica.
+- Escalamiento principalmente vertical.
+- Windows Services no preparados para entornos cloud.
+
+### Deuda técnica
+- WCF es tecnología en desuso.
+- .NET Framework limita adopción de nuevas capacidades (.NET moderno).
+- Falta de separación clara de responsabilidades.
+
+## 1️ Propuesta de Solución - Nueva Arquitectura
+La arquitectura propuesta se basa en Clean Architecture combinada con CQRS, con el objetivo de lograr una solución desacoplada, mantenible y preparada para escalar. Clean Architecture permite organizar el sistema en capas claramente definidas, donde el dominio y las reglas de negocio permanecen independientes de frameworks, infraestructura y tecnologías externas, garantizando estabilidad ante cambios. Sobre esta base, CQRS separa explícitamente las responsabilidades de lectura y escritura, simplificando la lógica, mejorando la claridad del código y permitiendo optimizar cada flujo de forma independiente. Esta combinación facilita la testabilidad, reduce la deuda técnica del sistema legacy y habilita una migración progresiva hacia una arquitectura moderna, alineada con principios SOLID y preparada para escenarios cloud y de alta demanda.
+
+<img width="1536" height="1024" alt="diagrama-arquitectura" src="https://github.com/user-attachments/assets/50217668-2d7c-4c03-9df1-11c883b82a2a" />
+
+##
+**Principios base:**
+
+**Clean Architecture:** capas independientes y dependencias hacia el dominio.
+
+**SOLID:** código extensible, mantenible y testeable.
+
+**CQRS:** separación clara entre comandos y consultas.
 
 ## 1️ OrderManagement.Api  
+
 **API REST (.NET moderno)**
+OrderManagement.Api es la capa de exposición del sistema, responsable de ofrecer las funcionalidades del dominio a través de APIs REST seguras y desacopladas. Actúa como el punto de entrada para aplicaciones cliente (web, mobile u otros sistemas), recibiendo solicitudes HTTP, validándolas y delegando su ejecución a la capa Application mediante comandos y consultas (CQRS). Esta capa no contiene lógica de negocio, limitándose a orquestar los casos de uso, manejar aspectos transversales como autenticación, autorización, versionado, manejo de errores y logging, garantizando así una comunicación clara, mantenible y preparada para integración con sistemas legacy y arquitecturas modernas.
 
 ### 🎯 Finalidad técnica
 Exponer endpoints REST para la gestión de órdenes y autenticación, sirviendo como **fachada moderna** del sistema.
@@ -27,6 +72,8 @@ Desacopla los clientes (Web, servicios, workers) de la lógica de negocio.
 ## 2 OrderManagement.Application  
 **Capa de aplicación (Clean Architecture + CQRS)**
 
+OrderManagement.Application representa la capa de aplicación y orquestación de casos de uso del sistema. Su responsabilidad principal es coordinar la ejecución de la lógica de negocio definida en el dominio, aplicando el patrón CQRS para separar claramente las operaciones de escritura (Commands) y lectura (Queries). En esta capa se definen los casos de uso, validaciones de negocio, reglas de flujo y contratos (interfaces) hacia servicios externos o infraestructura, sin depender de implementaciones concretas. Gracias a este enfoque, la capa Application actúa como el corazón funcional de la solución, garantizando alta testabilidad, bajo acoplamiento y alineación con los principios SOLID, además de facilitar la evolución y modernización progresiva del sistema legacy.
+
 ### 🎯 Finalidad técnica
 Contener **los casos de uso y reglas de negocio del sistema**.
 
@@ -41,6 +88,47 @@ Contener **los casos de uso y reglas de negocio del sistema**.
 ### 🧠 Rol arquitectónico
 Es el **núcleo del sistema**.  
 Aquí viven las reglas de negocio, independientes de UI, base de datos o frameworks.
+
+---
+
+## 1️⃣ OrderManagement.Domain  
+**Dominio del negocio (Core del sistema)**
+
+OrderManagement.Domain representa el núcleo del negocio del sistema y contiene el modelo de dominio puro. En esta capa se definen las entidades, value objects e invariantes que gobiernan el comportamiento de las órdenes, completamente independientes de frameworks, bases de datos o interfaces de usuario. Su propósito es encapsular las reglas fundamentales del negocio y garantizar su consistencia, sirviendo como la fuente de verdad sobre cómo debe comportarse el sistema ante cualquier caso de uso.
+
+### 🎯 Finalidad técnica
+Representar el **modelo de dominio puro**, independiente de frameworks, bases de datos o UI.
+
+### 📌 Características principales
+- Entidades de dominio (`Order`, `OrderDetail`)
+- Value Objects
+- Reglas de negocio fundamentales
+- Invariantes del dominio
+- Sin dependencias externas
+
+### 🧠 Rol arquitectónico
+Es la **fuente de verdad del negocio**.  
+No conoce ni API, ni MVC, ni WCF, ni base de datos.
+
+---
+
+## 3️⃣ OrderManagement.Infrastructure  
+**Infraestructura y detalles técnicos**
+
+OrderManagement.Infrastructure implementa los detalles técnicos de persistencia e integración definidos por la capa Application, incluyendo el acceso a datos mediante Entity Framework, la implementación concreta de repositorios y la configuración de contextos de base de datos. Esta capa actúa como adaptador entre el dominio y las tecnologías externas, encapsulando decisiones técnicas como el proveedor de base de datos, estrategias de mapeo y mecanismos de almacenamiento, de manera que la lógica de negocio permanece desacoplada de frameworks y detalles de infraestructura.
+
+### 🎯 Finalidad técnica
+Implementar los **detalles técnicos** definidos por la capa Application.
+
+### 📌 Características principales
+- Implementación de repositorios
+- Acceso a datos (EF Core / simulación)
+- Integraciones externas
+- Persistencia
+- Implementación de interfaces definidas en Application
+
+### 🧠 Rol arquitectónico
+Contiene lo que **puede cambiar** (DB, servicios externos, infraestructura).
 
 ---
 
