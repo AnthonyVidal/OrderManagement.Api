@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Elementos de la solución/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="../OrderManagement.Application/OrderManagement.Application.csproj" />
+  <Project Path="../OrderManagement.Domain/OrderManagement.Domain.csproj" />
+  <Project Path="../OrderManagement.Infrastructure/OrderManagement.Infrastructure.csproj" />
+  <Project Path="../OrderManagement.WCFClient/OrderManagement.WcfService.csproj" Id="f4a3a783-7248-4411-ba2f-e35884d18c0b" />
+  <Project Path="../OrderManagement.Worker/OrderManagement.Worker.csproj" Id="c7889021-b860-42ce-a17a-0755a6ae2005" />
+  <Project Path="../OrderManagment.Web/OrderManagement.Web.csproj" Id="cdb3c0b4-e14e-46b1-a4d6-6a303391aa6e" />
+  <Project Path="OrderManagement.Api.csproj" />
+</Solution>

@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Orders";
+}
+
+@model List<OrderManagement.Web.Models.OrderViewModel>
+
+<h2>Órdenes</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">Nueva Orden</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Total</th>
+            <th>Fecha</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var o in Model)
+        {
+            <tr>
+                <td>@o.Id</td>
+                <td>@o.Cliente</td>
+                <td>@o.Total</td>
+                <td>@o.CreatedAt.ToShortDateString()</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@o.Id">Ver</a> |
+                    <a asp-action="Edit" asp-route-id="@o.Id">Editar</a> |
+                    <a asp-action="Delete" asp-route-id="@o.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

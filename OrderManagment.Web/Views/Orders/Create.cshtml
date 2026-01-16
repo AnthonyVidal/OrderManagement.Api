@@ -1,0 +1,56 @@
+﻿@model OrderManagement.Web.Models.CreateOrderViewModel
+@{
+    ViewData["Title"] = "Nueva Orden";
+    var isPost = Context.Request.Method == "POST";
+}
+<h2>Nueva Orden</h2>
+
+<form asp-action="Create" method="post">
+
+    @if (isPost && !ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Se encontraron errores:</strong>
+            <ul class="mb-0">
+                @foreach (var error in ViewData.ModelState.Values
+                            .SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="mb-3">
+        <label asp-for="Fecha"></label>
+        <input asp-for="Fecha" class="form-control" type="date" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Cliente"></label>
+        <input asp-for="Cliente" class="form-control" />
+    </div>
+
+    <h4>Detalle</h4>
+
+    @for (int i = 0; i < Model.Details.Count; i++)
+    {
+        <div class="row mb-2">
+            <div class="col">
+                <input asp-for="Details[i].Producto" class="form-control" placeholder="Producto" />
+            </div>
+            <div class="col">
+                <input asp-for="Details[i].Cantidad"
+                       type="number"
+                       step="1"
+                       min="1"
+                       class="form-control" />
+            </div>
+            <div class="col">
+                <input asp-for="Details[i].PrecioUnitario" class="form-control" />
+            </div>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+</form>

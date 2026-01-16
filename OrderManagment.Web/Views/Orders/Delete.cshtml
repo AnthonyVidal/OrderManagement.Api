@@ -1,0 +1,13 @@
+﻿@model OrderManagement.Web.Models.OrderViewModel
+
+<h2>Eliminar Orden</h2>
+
+<p>¿Está seguro que desea eliminar esta orden?</p>
+
+<strong>@Model.Cliente</strong> - @Model.Total
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
